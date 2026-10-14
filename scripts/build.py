@@ -226,7 +226,9 @@ def crosscheck_mcp_source(root, mcp_root=None, manifest_path=None):
     require(manifest.get('source_manifest_sha256') == lock.get('source_manifest_sha256'),
             'Supplied MCP source manifest checksum does not match the pinned source')
     native = lock.get('native_tools', [])
-    require(sorted([*manifest.get('implemented_tools', []), *native]) == sorted(lock['implemented_tools']),
+    embedded_only = set(manifest.get('exposure', {}).get('embedded_only', []))
+    api_tools = [name for name in manifest.get('implemented_tools', []) if name not in embedded_only]
+    require(sorted([*api_tools, *native]) == sorted(lock['implemented_tools']),
             'Supplied MCP implemented tool list does not match the packaged snapshot')
     require(sorted(manifest.get('exposure', {}).get('public_excluded', [])) == lock.get('public_excluded', []),
             'Supplied MCP public exposure exclusions do not match the packaged snapshot')

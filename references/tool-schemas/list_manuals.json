@@ -6,8 +6,8 @@
       "agent_id": {
         "type": "string",
         "format": "uuid",
-        "title": "Agent Id",
-        "description": "Agent UUID returned as `agent_id`."
+        "description": "Agent UUID returned as `agent_id`.",
+        "title": "Agent Id"
       }
     },
     "required": [

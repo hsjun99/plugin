@@ -2,7 +2,8 @@
 
 The implemented set is the manifest ``implemented_tools`` plus the MCP-native tools
 (contracts with status ``mcp_native_tool_not_api_bound``), which are registered outside the
-manifest. Run ``python3 scripts/build.py --mcp-root <checkout>`` afterwards to cross-check.
+manifest, minus ``exposure.embedded_only`` tools, which only the embedded Copilot runtime sees
+and this public plugin does not ship. Run ``python3 scripts/build.py --mcp-root <checkout>`` afterwards to cross-check.
 """
 import argparse
 import hashlib
@@ -33,8 +34,10 @@ def sync(mcp_root, root=ROOT):
     native = sorted(path.stem for path in contracts_dir.glob('*.json')
                     if path.name != 'manifest.json' and load_json(path).get('status') == NATIVE_STATUS)
     require(native, 'No MCP-native tool contracts found')
-    implemented = sorted({*manifest['implemented_tools'], *native})
-    require(len(implemented) == len(manifest['implemented_tools']) + len(native),
+    embedded_only = set(manifest.get('exposure', {}).get('embedded_only', []))
+    api_tools = [name for name in manifest['implemented_tools'] if name not in embedded_only]
+    implemented = sorted({*api_tools, *native})
+    require(len(implemented) == len(api_tools) + len(native),
             'A native tool is also listed in the manifest implemented tools')
     public_excluded = sorted(manifest.get('exposure', {}).get('public_excluded', []))
     require(set(public_excluded) <= set(implemented), 'public_excluded names an unknown tool')

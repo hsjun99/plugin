@@ -1,6 +1,6 @@
 {
-  "mcp_commit": "c7fe79bf29d2da29d69822e7c495d8bc3c19b61d",
-  "manifest_sha256": "aae0172772919a8e81fcd07227e3e68597a5dde9586daeed606662740a08fff3",
+  "mcp_commit": "b61bd9e4f950e29bc1cc571486a25afa87c9b996",
+  "manifest_sha256": "e23b48b1659ff5806afac4564ffc8f99f1ca116f0d1ca65e8f5ba6ec69735e85",
   "source_manifest_sha256": "f7c583c38b19d9d910233c285f012783acb840f0aa027dd9821e42d919224c3c",
   "source_state": "clean_commit",
   "dirty_contracts": [],
@@ -122,16 +122,16 @@
     "publish_agent_version": "8c42adee4091cc0eb599beb5b9e05fdcd00c923142ea4ee514c4007af645a8d1",
     "resolve_customer": "e9a9cb6440d2b97756d3a5b40f2ed086e999b90cfe0d5097193f274e3d2e51f4",
     "resume_campaign": "013d55a39ff1c8c0db4b8caf25778c44cec709a59f12bd53cafca7dafeb14847",
-    "save_agent": "4e04e539ee26d6acf654c7458b43ae002cc079f513627b1942943c7244c01759",
+    "save_agent": "4ebf70e56de7c1cb0ac9703d3dd825a2d1219cdb3df03d4c01b75249af6450f8",
     "save_customer": "66a41781581eef0961ea3f03b572e4bb8927b3cc4b0604867ee75ed17480872b",
     "save_customer_attribute_definition": "f6f964fbac7d91421d55eb9ce99fac8af481c2225ac623fc404388e9fff15521",
-    "save_manual": "359ae3b932edad002a1e4085ef23551f24a9871b2a653d57965734bc0efe87b9",
+    "save_manual": "232a87e7ea699bcfc72f70bdf08a7b3cb8e6d116892d354758eb45ed8e98b540",
     "save_tool": "eed63880366b141980f680e70057a6e48b843cd75ffdf8b143af211e302df74d",
     "save_work_record": "544faa21b382935b23931fc64d6267d6db9f0dee1b1ebd3642d74545739a25c6",
     "set_number_agents": "2ed40604eae7ab66cf87b6a031138c00f5dba8851f8c88b35efb1867a84b3b5b",
     "set_organization": "b12310a95ff2b797dbb045b0b53cff7fc013b2412e69be193778d2755df00031",
     "update_number": "f9a3206c8e52988ffccac582947fe0d1f56a71426097d80a026e41e5ed16e505",
-    "update_organization": "6aa847bdbf6fb23ce6c79d81a5ea6a36228b44660efd4c9b05f539d7ef94657f",
-    "validate_flow": "920af07ce938b84441a71bff01d05a327b5e80be97e665d480737f1ab381390a"
+    "update_organization": "6e4bb092a69705c97c44cb07a37e8d2b5db3ff2c4e8914f67b1b48764f568548",
+    "validate_flow": "f2c83587c7b3ea9adf2112498f6caf35936b4fa2d04bfd2dccf5adadfe120c8a"
   }
 }

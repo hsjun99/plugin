@@ -1,6 +1,6 @@
 {
   "name": "vox-ai",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "description": "vox.ai 음성 에이전트 설계·구축·운영을 위한 MCP 연결과 공통 스킬",
   "author": {
     "name": "vox.ai",

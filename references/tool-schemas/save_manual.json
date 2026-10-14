@@ -152,9 +152,6 @@
                   "$ref": "#/$defs/SearchAddressTool"
                 },
                 {
-                  "$ref": "#/$defs/SkillTool-Input"
-                },
-                {
                   "$ref": "#/$defs/ExtractVariablesTool"
                 }
               ]
@@ -363,7 +360,7 @@
               "warm"
             ],
             "title": "Transfertype",
-            "description": "Call transfer mode: `cold` removes the agent as soon as the call is transferred and does not brief the operator; `warm` puts the customer on hold, briefs the operator with a conversation summary or static sentence, and then connects them. If the operator does not answer within 30 seconds, the agent resumes handling the customer.",
+            "description": "Call transfer mode: `cold` removes the agent as soon as the call is transferred and does not brief the operator; `warm` puts the customer on hold, briefs the operator with a conversation summary or static sentence, and then connects them. If the operator does not answer within `ringDurationInSeconds`, the agent resumes handling the customer.",
             "default": "cold"
           },
           "transferMessageType": {
@@ -436,6 +433,20 @@
             ],
             "title": "Holdaudio",
             "description": "What the customer hears while a `warm` transfer rings the destination. Omit or `ringback` for the default ringback tone, `none` for silence, or the `file_key` of an audio file uploaded with `POST /files` and `purpose=hold_audio`. Ignored for `cold` transfers and `operator` destinations."
+          },
+          "ringDurationInSeconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 90.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ringdurationinseconds",
+            "description": "How many seconds a `warm` transfer rings the destination before it counts as unanswered, 1 to 90. Omit or null for 30. When nobody answers, a single-prompt agent resumes the conversation and a flow follows the transfer node's fallback edge. Ignored for `cold` transfers and `operator` destinations."
           }
         },
         "type": "object",
@@ -917,188 +928,6 @@
         "title": "SearchAddressTool",
         "additionalProperties": false
       },
-      "SkillTool-Input": {
-        "properties": {
-          "speakDuringExecution": {
-            "anyOf": [
-              {
-                "$ref": "#/$defs/app__dto__builtin_tool__SpeakDuringExecution"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "Speech messages played while the tool executes."
-          },
-          "allowInterruptionDuringExecution": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Allowinterruptionduringexecution",
-            "description": "Whether the user may interrupt speech while the tool executes. Omission or null allows interruption by default."
-          },
-          "responseMode": {
-            "type": "string",
-            "enum": [
-              "wait",
-              "fire_and_forget"
-            ],
-            "title": "Responsemode",
-            "description": "`wait` blocks on tool completion. `fire_and_forget` starts the tool and lets the conversation continue.",
-            "default": "wait"
-          },
-          "toolType": {
-            "type": "string",
-            "const": "skill",
-            "title": "Tool type",
-            "description": "Built-in tool type."
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Human-readable resource name."
-          },
-          "toolCallSound": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "none",
-                  "typing",
-                  "elevator_1",
-                  "elevator_2",
-                  "elevator_3",
-                  "elevator_4"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Toolcallsound",
-            "description": "Sound played while the tool runs, so the line does not go silent. Omit or `none` to play nothing; `typing` or `elevator_1`..`elevator_4` to pick a preset."
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "Human-readable description."
-          },
-          "skill": {
-            "$ref": "#/$defs/SkillPayload",
-            "description": "Skill payload. The v3 API field is `skill`; it is stored as `skillPayload` when executing calls."
-          }
-        },
-        "type": "object",
-        "required": [
-          "toolType",
-          "name",
-          "skill"
-        ],
-        "title": "SkillTool",
-        "additionalProperties": false
-      },
-      "SkillPayload": {
-        "properties": {
-          "skills": {
-            "items": {
-              "$ref": "#/$defs/SkillItem"
-            },
-            "type": "array",
-            "minItems": 1,
-            "title": "Skills",
-            "description": "Skills available to this meta-tool. At least one skill is required."
-          },
-          "initSkillId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Initskillid",
-            "description": "Optional skill ID to start with before the LLM chooses another skill."
-          },
-          "initSkillName": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Initskillname",
-            "description": "Optional skill name to start with before the LLM chooses another skill."
-          }
-        },
-        "type": "object",
-        "required": [
-          "skills"
-        ],
-        "title": "SkillPayload",
-        "description": "Skill 호출 payload.",
-        "additionalProperties": false
-      },
-      "SkillItem": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id",
-            "description": "Skill identifier unique within this tool."
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Skill name exposed to the LLM."
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "When the LLM should use this skill."
-          },
-          "content": {
-            "type": "string",
-            "title": "Content",
-            "description": "Prompt or instruction content executed by this skill."
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "content"
-        ],
-        "title": "SkillItem",
-        "description": "Single skill definition inside a Skill built-in tool.",
-        "additionalProperties": false
-      },
       "ExtractVariablesTool": {
         "properties": {
           "toolType": {
@@ -1236,9 +1065,6 @@
                     },
                     {
                       "$ref": "#/$defs/SearchAddressTool"
-                    },
-                    {
-                      "$ref": "#/$defs/SkillTool-Input"
                     },
                     {
                       "$ref": "#/$defs/ExtractVariablesTool"

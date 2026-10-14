@@ -151,7 +151,7 @@ Manual을 새로 설계할 때 지키고, 저장한 뒤 `get_agent`·`get_manual
 - `transfer_call`: "상담원·직원·담당자 바꿔 주세요"처럼 사람 응대가 필요할 때 쓴다.
   - 연결 대상이 여럿이면 대상마다 `transferCondition`을 쓴다. 모델은 이 조건을 보고 대상을 고른다.
   - 성공하면 `transfer_successful: true`가 온다. cold 전환이면 AI는 통화에서 빠진다.
-  - 전환이 안 되면(warm에서 상대가 30초 안에 받지 않음, 웹 통화 등) `transfer_call failed: <사유>` 오류가 오고 AI가 통화를 이어 간다. 위 '전환'의 대안으로 넘어간다.
+  - 전환이 안 되면(warm에서 상대가 `ringDurationInSeconds`초 안에 받지 않음(1~90, 비우면 30), 웹 통화 등) `transfer_call failed: <사유>` 오류가 오고 AI가 통화를 이어 간다. 위 '전환'의 대안으로 넘어간다.
   - 웹 통화에서는 대기 멘트를 말한 뒤에 실패한다. 전환은 전화로 시험한다.
 - `transfer_agent`: 다른 업무나 언어를 맡은 같은 조직의 에이전트가 이어받아야 할 때 쓴다. 대상은 `agent.agent_id`로 정하고, 없는 에이전트를 지정하면 저장이 거부된다.
   - 성공하면 대상 에이전트가 대화를 이어받는다. `preserveChatContext`가 false면 대상은 앞 대화를 모르므로, 넘기기 전에 받은 값을 다시 묻게 된다.
@@ -163,7 +163,6 @@ Manual을 새로 설계할 때 지키고, 저장한 뒤 `get_agent`·`get_manual
 - `send_dtmf`: 아웃바운드 통화에서 상대 ARS가 "○번을 눌러 주세요"라고 할 때 에이전트가 번호를 누르는 도구다. 고객이 우리 쪽 키패드 메뉴를 누르는 업무에는 쓰지 않는다([유형 선택](../voice-agent-design/SKILL.md)의 Flow).
   - 입력은 `digits`(0-9, `*`, `#`)다. 성공하면 결과 문장 없이 다음 안내를 기다린다. 실행 중 멘트는 지원하지 않고, 이어서 누를 때는 3초 간격이 생긴다.
   - 실패하면 `success: false`와 `error`가 온다. 같은 메뉴에서는 한 번만 다시 누르고, 그래도 안 되면 음성 응답이나 사람 연결로 넘어간다.
-- `skill`: Manual에 넣지 않는다. Manual에 둔 `skill`은 통화에서 무시된다. 업무 절차는 Manual로 나눈다.
 - `end_call`: 끝인사를 마쳤거나 고객이 더 문의할 것이 없다고 할 때, 결과별 종료가 정해졌을 때 쓴다.
   - 실행 중 멘트가 있으면 그것을 작별 인사로 말한 뒤 끊고, `call_ended: true`가 온다.
   - Single 에이전트에서 고객이 작별 인사를 끊고 말하면 `call_ended: false, interrupted: true`가 오고 통화가 이어진다. 고객 말에 답한 뒤 다시 종료한다.

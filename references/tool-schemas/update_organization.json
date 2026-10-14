@@ -47,6 +47,20 @@
             "type": "array",
             "title": "Billing Invoice Recipient Emails",
             "description": "청구서 안내 수신 이메일 목록. 소문자로 정규화되며 중복은 거부된다. `null`은 거부되고, 생략 시 유지."
+          },
+          "customer_retention_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 315576000.0,
+                "minimum": 86400.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Retention Seconds",
+            "description": "고객 보존 기간(초). 마지막 연락 후 이 기간이 지난 고객을 고객의 식별자·속성·메모·메모리와 함께 삭제한다. 86400(1일) 이상 315576000(10년) 이하의 정수이며, `null`이면 무기한 보관한다. 저장하면 이미 있는 고객에도 적용되고, 값을 줄이면 조건에 해당하는 고객이 곧 삭제된다. 생략 시 유지."
           }
         },
         "type": "object",

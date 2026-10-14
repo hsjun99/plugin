@@ -551,9 +551,9 @@
             "anyOf": [
               {
                 "enum": [
+                  "none",
                   "static",
-                  "dynamic",
-                  "none"
+                  "dynamic"
                 ],
                 "type": "string"
               },
@@ -561,6 +561,7 @@
                 "type": "null"
               }
             ],
+            "description": "Speech mode. When omitted, the runtime uses dynamic. The schema null default represents an unset field, not static speech or silence. Set none, static, or dynamic explicitly to choose the behavior.",
             "title": "Prompt Type"
           },
           "prompt": {
@@ -884,9 +885,9 @@
             "anyOf": [
               {
                 "enum": [
+                  "none",
                   "static",
-                  "dynamic",
-                  "none"
+                  "dynamic"
                 ],
                 "type": "string"
               },
@@ -1346,13 +1347,39 @@
             "title": "Sip Headers",
             "description": "SIP headers attached to the transfer call."
           },
+          "hold_audio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the customer hears while a `warm` transfer rings the destination. Omit or `ringback` for the default ringback tone, `none` for silence, or the `file_key` of an audio file uploaded with `POST /files` and `purpose=hold_audio`. Ignored for `cold` transfers and `operator` destinations.",
+            "title": "Hold Audio"
+          },
+          "ring_duration_in_seconds": {
+            "anyOf": [
+              {
+                "maximum": 90,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How many seconds a `warm` transfer rings the destination before it counts as unanswered, 1 to 90. Omit or null for 30. When nobody answers, a single-prompt agent resumes the conversation and a flow follows the transfer node's fallback edge. Ignored for `cold` transfers and `operator` destinations.",
+            "title": "Ring Duration In Seconds"
+          },
           "prompt_type": {
             "anyOf": [
               {
                 "enum": [
+                  "none",
                   "static",
-                  "dynamic",
-                  "none"
+                  "dynamic"
                 ],
                 "type": "string"
               },
@@ -1360,6 +1387,7 @@
                 "type": "null"
               }
             ],
+            "description": "Speech mode. When omitted, the runtime uses dynamic. The schema null default represents an unset field, not static speech or silence. Set none, static, or dynamic explicitly to choose the behavior.",
             "title": "Prompt Type"
           },
           "prompt": {
@@ -1601,9 +1629,9 @@
             "anyOf": [
               {
                 "enum": [
+                  "none",
                   "static",
-                  "dynamic",
-                  "none"
+                  "dynamic"
                 ],
                 "type": "string"
               },
@@ -1611,6 +1639,7 @@
                 "type": "null"
               }
             ],
+            "description": "Speech mode. When omitted, the runtime uses dynamic. The schema null default represents an unset field, not static speech or silence. Set none, static, or dynamic explicitly to choose the behavior.",
             "title": "Prompt Type"
           },
           "prompt": {

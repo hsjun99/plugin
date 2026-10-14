@@ -1,9 +1,9 @@
 {
-  "snapshot_date": "2026-10-07",
+  "snapshot_date": "2026-10-01",
   "scope": "Local MCP source contract candidate. The source worktree state is recorded below; this is not a deployed-server inventory. A connected host may expose fewer tools or permissions; inspect its live tools and schemas before acting.",
   "source": {
-    "mcp_commit": "c7fe79bf29d2da29d69822e7c495d8bc3c19b61d",
-    "manifest_sha256": "aae0172772919a8e81fcd07227e3e68597a5dde9586daeed606662740a08fff3",
+    "mcp_commit": "b61bd9e4f950e29bc1cc571486a25afa87c9b996",
+    "manifest_sha256": "e23b48b1659ff5806afac4564ffc8f99f1ca116f0d1ca65e8f5ba6ec69735e85",
     "source_manifest_sha256": "f7c583c38b19d9d910233c285f012783acb840f0aa027dd9821e42d919224c3c",
     "source_state": "clean_commit",
     "dirty_contracts": []
@@ -269,7 +269,7 @@
     },
     "save_agent": {
       "path": "tool-schemas/save_agent.json",
-      "sha256": "4e04e539ee26d6acf654c7458b43ae002cc079f513627b1942943c7244c01759"
+      "sha256": "4ebf70e56de7c1cb0ac9703d3dd825a2d1219cdb3df03d4c01b75249af6450f8"
     },
     "save_customer": {
       "path": "tool-schemas/save_customer.json",
@@ -281,7 +281,7 @@
     },
     "save_manual": {
       "path": "tool-schemas/save_manual.json",
-      "sha256": "359ae3b932edad002a1e4085ef23551f24a9871b2a653d57965734bc0efe87b9"
+      "sha256": "232a87e7ea699bcfc72f70bdf08a7b3cb8e6d116892d354758eb45ed8e98b540"
     },
     "save_tool": {
       "path": "tool-schemas/save_tool.json",
@@ -305,11 +305,11 @@
     },
     "update_organization": {
       "path": "tool-schemas/update_organization.json",
-      "sha256": "6aa847bdbf6fb23ce6c79d81a5ea6a36228b44660efd4c9b05f539d7ef94657f"
+      "sha256": "6e4bb092a69705c97c44cb07a37e8d2b5db3ff2c4e8914f67b1b48764f568548"
     },
     "validate_flow": {
       "path": "tool-schemas/validate_flow.json",
-      "sha256": "920af07ce938b84441a71bff01d05a327b5e80be97e665d480737f1ab381390a"
+      "sha256": "f2c83587c7b3ea9adf2112498f6caf35936b4fa2d04bfd2dccf5adadfe120c8a"
     }
   }
 }

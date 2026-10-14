@@ -14,7 +14,7 @@
 - 시스템 변수 `current_time`은 통화 시작 시각을 KST 문자열 `YYYY-MM-DD HH:MM:SS+0900 (Ddd)`로 담는다(예: `2026-10-01 14:30:00+0900 (Thu)`). logic `left`에 그대로 쓸 수 있고, 값은 통화 중 고정된다.
 - **무입력(침묵)은 전환을 일으키지 않는다.** 노드가 약 10초 뒤 같은 안내를 다시 말하고, 이후 간격이 3초씩 늘며 반복된다. `silenceCallTimeoutInSeconds`에 닿으면 통화가 끝난다.
 - `sendSms`는 통화 중 그 노드에 도달한 순간 발송된다. 통화 후 발송 기능은 없다.
-- warm 전환은 상대를 약 30초 호출한다. 받지 않으면 transferCall의 `fallback` edge로 이어진다. cold 전환은 실패해도 ARS로 돌아오지 않는다.
+- warm 전환은 상대를 transferCall 노드의 `ring_duration_in_seconds`초(1~90, 비우면 30) 호출한다. 받지 않으면 transferCall의 `fallback` edge로 이어진다. cold 전환은 실패해도 ARS로 돌아오지 않는다.
 
 ## 전체 구조
 ```
