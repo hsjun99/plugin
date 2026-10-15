@@ -63,6 +63,12 @@ ENTRY_SKILL_CAPS = {
     'skills/voice-agent-design/SKILL.md': 3227,
 }
 
+# v0.2.16 decision-slots additions. These are new, separate caps; the existing
+# entry caps, the 34,058 skill-total cap and the 16,322 hotpath cap are unchanged.
+BUILD_FIRST_DECISION_CAP = 3367
+HOST_ADAPTERS_CAP = 2750
+DECISION_SLOTS_JSON_CAP = 2500
+
 HOTPATH_FILES = (
     'skills/build-first-voice-agent/SKILL.md',
     'skills/manual-authoring/SKILL.md',
@@ -136,6 +142,16 @@ class GuidanceTokenBudgetTests(unittest.TestCase):
         for path, cap in ENTRY_SKILL_CAPS.items():
             with self.subTest(path=path):
                 self.assertLessEqual(self.token_count(path), cap)
+
+    def test_decision_slots_additions_stay_within_their_new_caps(self):
+        for path, cap in (
+            ('skills/build-first-voice-agent/SKILL.md', BUILD_FIRST_DECISION_CAP),
+            ('references/host-adapters.md', HOST_ADAPTERS_CAP),
+            ('references/decision-slots.json', DECISION_SLOTS_JSON_CAP),
+        ):
+            with self.subTest(path=path):
+                actual = self.token_count(path)
+                self.assertLessEqual(actual, cap, f'{path}: {actual} tokens exceeds {cap}')
 
     def test_skill_total_stays_within_five_percent_of_baseline(self):
         paths = self.current_skill_paths()

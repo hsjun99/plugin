@@ -89,6 +89,65 @@ class BuildTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'exactly the vox-ai and vox-docs'):
             self.run_build()
 
+    def change_slots(self, change):
+        path = self.root / 'references/decision-slots.json'
+        value = json.loads(path.read_text(encoding='utf-8'))
+        change(value)
+        path.write_text(json.dumps(value, ensure_ascii=False, separators=(',', ':')) + '\n',
+                        encoding='utf-8')
+
+    def test_decision_slots_reject_profile_key_outside_slots(self):
+        self.change_slots(lambda d: d['profiles'][0]['common'].append('missing_slot'))
+        with self.assertRaisesRegex(ValueError, 'not defined in slots'):
+            self.run_build()
+
+    def test_decision_slots_reject_slot_set_drift(self):
+        self.change_slots(lambda d: d['slots'].pop('tone'))
+        with self.assertRaisesRegex(ValueError, 'exactly the 24'):
+            self.run_build()
+
+    def test_decision_slots_reject_unused_or_duplicate_campaign_keys(self):
+        self.change_slots(lambda d: d['campaign_slots']['value'].update(orphan='unused'))
+        with self.assertRaisesRegex(ValueError, 'by_campaign keys must match'):
+            self.run_build()
+
+    def test_decision_slots_reject_value_slot_without_never_invent(self):
+        self.change_slots(lambda d: d['slots']['handoff'].pop('never_invent'))
+        with self.assertRaisesRegex(ValueError, 'never_invent'):
+            self.run_build()
+
+    def test_decision_slots_reject_default_outside_choices(self):
+        self.change_slots(lambda d: d['slots']['persuasion'].update(default='once'))
+        with self.assertRaisesRegex(ValueError, 'default is not a choice'):
+            self.run_build()
+
+    def test_decision_slots_reject_affects_outside_agent_fields(self):
+        self.change_slots(lambda d: d['slots']['tone'].update(affects=['no_such_field.x']))
+        with self.assertRaisesRegex(ValueError, 'not an agent field'):
+            self.run_build()
+
+    def test_decision_slots_reject_unknown_workflow(self):
+        self.change_slots(lambda d: d['profiles'][0].update(workflow='missing'))
+        with self.assertRaisesRegex(ValueError, 'unknown workflow'):
+            self.run_build()
+
+    def test_decision_slots_reject_internal_ids_hosts_and_urls(self):
+        for text in ('시나리오 P3', 'PROD-12', 'Codex', 'https://example.com'):
+            with self.subTest(text=text):
+                self.change_slots(lambda d, text=text: d['kinds'].update(structure=text))
+                with self.assertRaisesRegex(ValueError, 'forbidden pattern'):
+                    self.run_build()
+
+    def test_decision_slots_reject_escaped_or_crlf_format(self):
+        path = self.root / 'references/decision-slots.json'
+        original = path.read_text(encoding='utf-8')
+        path.write_bytes(original.replace('\n', '\r\n').encode('utf-8'))
+        with self.assertRaisesRegex(ValueError, 'LF'):
+            self.run_build()
+        path.write_text(original.replace('목소리', '\\uBAA9\\uC18C\\uB9AC', 1), encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'forbidden pattern'):
+            self.run_build()
+
     def test_required_workflow_tool_must_be_in_implemented_snapshot(self):
         def remove_save_manual(snapshot):
             snapshot['implemented_tools'].remove('save_manual')

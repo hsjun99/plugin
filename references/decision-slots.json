@@ -1,0 +1,73 @@
+{
+ "schema_version":1,
+ "kinds":{
+  "structure":"답이 에이전트 유형·Manual 구성·방향을 바꾼다. 틀리면 다시 만든다",
+  "semi":"정해진 목록 안에서 고른다. 틀리면 그 부분만 고친다",
+  "value":"사용자만 아는 실제 값. 지어내지 않는다",
+  "feel":"목소리·첫 인사·말투처럼 들어 보고 고른다"
+ },
+ "tiers":{"1":"사용자만 앎. 없으면 결과가 껍데기가 된다","2":"기본값으로 시작하고 바꿀 수 있다","3":"플랫폼 기본값. 묻지 않는다"},
+ "profiles":[{
+  "id":"create",
+  "workflow":"authoring",
+  "common":["direction","base","source"],
+  "outbound":{"1":["campaign","list_columns","success","number_source","persuasion","script_mode"],"2":["identity","callback","followup_sms","result_delivery","voice","tone"],"3":["outbound_defaults"]},
+  "inbound":{"1":["scope","staffed_hours","handoff","intake_fields"],"2":["lookup","sms_links","urgent","voice","tone"],"3":["inbound_defaults"]},
+  "by_campaign":{
+   "promotion":["key_message","deadline"],
+   "lead_booking":["booking_slots","prepay","consult_route"],
+   "b2b_sales":["decision_maker","meeting_offer"],
+   "contract_check":["check_items","mismatch_action"],
+   "collection":["amount_vars","pay_methods","installment"],
+   "task_check":["status_values","due","contact_point"],
+   "consent":["consent_target","after_consent"],
+   "survey":["survey_items"],
+   "recruit":["offer_terms"]
+  }
+ }],
+ "slots":{
+  "direction":{"kind":"structure","means":"받는 전화인가, 명단으로 거는 전화인가, 시스템이 거는 전화인가","from":["request"],"affects":["agent_type","prompt.firstLine","postCall"],"choices":"direction"},
+  "base":{"kind":"structure","means":"기존 에이전트를 바탕으로 할지 새로 만들지","from":["tools"],"affects":["agent_type","manuals"]},
+  "source":{"kind":"structure","means":"근거 자료(URL·첨부·대본·명단)","from":["request"],"affects":["prompt.prompt","manuals","knowledge"]},
+  "campaign":{"kind":"structure","means":"누구에게 무슨 일로 거는가","from":["request"],"affects":["manuals","postCall","prompt.firstLine"],"choices":"campaign"},
+  "list_columns":{"kind":"semi","means":"올릴 명단에 있는 칸","from":["sheet","request"],"affects":["presetDynamicVariables","prompt.firstLine"],"choices":"sheet_vars"},
+  "success":{"kind":"semi","means":"통화가 잘되면 남아야 하는 것","from":["request"],"affects":["postCall","builtInTools.end_call"],"choices":"outcome_sets"},
+  "number_source":{"kind":"value","means":"번호를 어떻게 알았냐는 물음에 할 답","from":["request"],"affects":["manuals"],"choices":"number_source","never_invent":true},
+  "persuasion":{"kind":"semi","means":"관심 없다고 하면 몇 번 더 권하는가","affects":["manuals"],"choices":"not_interested","default":"한 번만 짧게 다시 권유"},
+  "script_mode":{"kind":"structure","means":"그대로 말해야 하는 멘트가 있는가","from":["source"],"affects":["agent_type","manuals"],"choices":"script_mode"},
+  "identity":{"kind":"semi","means":"본인 확인 방법. 계약 확인·수납·동의 수집은 켜고 행사 안내는 끈다","affects":["manuals"],"choices":"identity"},
+  "callback":{"kind":"semi","means":"지금 바쁘다고 하면 재통화 시간 받기","affects":["manuals","postCall"],"choices":"callback"},
+  "followup_sms":{"kind":"value","means":"끝나고 보낼 문자와 링크·문의처","from":["source"],"affects":["builtInTools.send_sms"],"never_invent":true},
+  "result_delivery":{"kind":"semi","means":"결과를 받을 곳","affects":["webhookSettings"],"choices":"result_delivery","default":"대시보드만"},
+  "scope":{"kind":"structure","means":"이 번호로 오는 전화 종류","from":["source","request"],"affects":["manuals","postCall"],"choices":"inbound_scope"},
+  "staffed_hours":{"kind":"value","means":"사람이 받을 수 있는 시간과 없는 시간","from":["source"],"affects":["manuals","builtInTools.transfer_call"],"choices":"hours_branch","never_invent":true},
+  "handoff":{"kind":"value","means":"넘길 곳(부서 번호·콜백 접수·문자 안내)","affects":["builtInTools.transfer_call","manuals"],"never_invent":true},
+  "intake_fields":{"kind":"semi","means":"통화에서 받아 둘 것","from":["source"],"affects":["manuals","postCall"],"choices":"intake_fields"},
+  "lookup":{"kind":"semi","means":"발신번호로 고객을 조회할 수 있는가","affects":["toolIds"]},
+  "sms_links":{"kind":"value","means":"문자로 보낼 위치·서류·예약 링크","from":["source"],"affects":["builtInTools.send_sms"],"never_invent":true},
+  "urgent":{"kind":"semi","means":"위급 표현과 안내. 기본은 전화 종류에 맞춘다","affects":["manuals"]},
+  "voice":{"kind":"feel","means":"목소리","from":["tools"],"affects":["voice"],"listen":true},
+  "tone":{"kind":"feel","means":"첫 인사와 응대 느낌","affects":["prompt.firstLine","prompt.prompt"],"listen":true},
+  "outbound_defaults":{"kind":"semi","means":"통화 가능 확인, 제3자에게 용건 비공개, 음성사서함이면 종료, 수신거부 즉시 기록·종료, 침묵 두 번이면 종료, AI냐고 물으면 밝힘, 필요하면 녹음 고지, 야간 금지, 숫자·금액 읽기, 지어내지 않기","affects":["prompt.prompt","manuals","postCall"]},
+  "inbound_defaults":{"kind":"semi","means":"문의 유형 기록, 통화 요약, AI·녹음 고지, 두 번 못 알아들으면 연결이나 콜백","affects":["prompt.prompt","postCall"]}
+ },
+ "campaign_slots":{
+  "value":{"key_message":"꼭 전할 핵심 한두 문장","deadline":"행사·혜택 마감일","booking_slots":"예약 받을 수 있는 일정과 지점","check_items":"확인할 항목과 순서","pay_methods":"납부 방법","due":"처리 기한","contact_point":"문의처","consent_target":"무엇에 대한 수신 동의인가","survey_items":"질문 두세 개와 척도","offer_terms":"제시할 조건과 승인 범위"},
+  "semi":{"prepay":"선결제를 안내하는가","consult_route":"상담 연결 방식(전화 연결·방문)","decision_maker":"통화할 상대(대표·담당자)","meeting_offer":"미팅을 제안하는 방식","mismatch_action":"정보가 다를 때 처리","amount_vars":"안내할 금액·기간이 든 명단 칸","installment":"분할·유예를 받는가","status_values":"확인할 처리 상태 목록","after_consent":"동의 뒤 다음 행동"}
+ },
+ "choices":{
+  "direction":["받는 전화","명단으로 거는 전화","시스템이 거는 전화"],
+  "campaign":{"promotion":"행사·혜택 안내","lead_booking":"문의 고객 재접촉·예약","b2b_sales":"기업 영업·미팅 제안","contract_check":"계약·가입 확인","collection":"미납·수납 안내","task_check":"업무 확인·요청","consent":"수신 동의 받기","survey":"설문·안부","recruit":"모집·참여 독려"},
+  "inbound_scope":{"ivr":"대표번호 안내·연결","reception":"부재·시간외 대리 응대","intake":"업무 접수"},
+  "number_source":["예전에 직접 문의 주신 번호","이벤트·상담 신청 때 남기신 번호","가입 때 등록한 연락처","마케팅 활용 동의 고객","사업자 공개 정보"],
+  "not_interested":["바로 정중히 마무리","한 번만 짧게 다시 권유","두세 번까지, 갈수록 약하게"],
+  "script_mode":["정해진 멘트 그대로","뼈대만 정해 둠","알아서"],
+  "identity":["이름만","이름과 생년월일","확인 안 함"],
+  "callback":["희망 시간 받기","편하실 때 다시 연락","문자로 대신"],
+  "result_delivery":["대시보드만","웹훅"],
+  "outcome_sets":{"lead":["상담예정","상담완료","등록예정","등록완료","재전화요망","거부","부재","기타"],"consent":["동의","설득 후 동의","결정 유예","최종 거절","수신거부","대상 아님","무응답"],"task_check":["담당자","담당자 아님","전달 필요","처리 예정","이미 처리","미처리","확인 필요"],"inbound":["예약 접수·변경·취소","진료·영업 시간","위치·주차","비용","서류","콜백","상담원 전환","중도 종료"],"flags":["통화 요약","후속 조치 필요","부정 반응","수신거부","재통화 희망 시각","문자 필요"]},
+  "sheet_vars":["고객명","거래처·매장명","상품·행사명","금액·할인액","날짜·기한","지점","계약 정보 묶음"],
+  "intake_fields":["이름","연락처","용건","희망 일정","주소","업무 고유 항목"],
+  "hours_branch":["영업 중 담당 연결","시간외 접수 뒤 콜백","항상 접수"]
+ }
+}

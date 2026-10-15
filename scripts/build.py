@@ -260,6 +260,85 @@ def crosscheck_mcp_source(root, mcp_root=None, manifest_path=None):
                 'Supplied MCP checkout state does not match the candidate snapshot')
 
 
+DECISION_SLOT_KEYS = frozenset({
+    'direction', 'base', 'source', 'campaign', 'list_columns', 'success', 'number_source',
+    'persuasion', 'script_mode', 'identity', 'callback', 'followup_sms', 'result_delivery',
+    'scope', 'staffed_hours', 'handoff', 'intake_fields', 'lookup', 'sms_links', 'urgent',
+    'voice', 'tone', 'outbound_defaults', 'inbound_defaults',
+})
+DECISION_SLOT_SOURCES = frozenset({'request', 'source', 'sheet', 'tools'})
+DECISION_SLOT_FORBIDDEN = (
+    r'\b[POD]\d+\b', r'\bI\d\b', r'PROD-', r'/Users/', r'상승비',
+    r'Claude|Codex|Grok|Copilot|코파일럿|ChatGPT|Cursor',
+    r'빈 preset|empty preset', r'https?://', r'\\u',
+)
+
+
+def validate_decision_slots(root):
+    """Check references/decision-slots.json structure, references and public-safety rules."""
+    path = root / 'references/decision-slots.json'
+    require(path.is_file(), 'Missing references/decision-slots.json')
+    raw = path.read_bytes()
+    require(b'\r' not in raw and raw.endswith(b'\n') and not raw.endswith(b'\n\n'),
+            'decision-slots.json must use LF and end with exactly one newline')
+    text = raw.decode('utf-8')
+    for pattern in DECISION_SLOT_FORBIDDEN:
+        require(not re.search(pattern, text), f'decision-slots.json contains forbidden pattern {pattern!r}')
+    data = load_json(path)
+    require(data.get('schema_version') == 1, 'decision-slots.json schema_version must be 1')
+    kinds, tiers = data['kinds'], data['tiers']
+    slots, choices = data['slots'], data['choices']
+    campaign_slots = data['campaign_slots']
+
+    require(set(slots) == DECISION_SLOT_KEYS, 'decision-slots.json slots must be exactly the 24 defined keys')
+    for key, slot in slots.items():
+        require(slot.get('kind') in kinds, f'decision slot {key}: unknown kind')
+        require(slot.get('means'), f'decision slot {key}: missing means')
+        require(slot.get('never_invent', False) is (slot['kind'] == 'value'),
+                f'decision slot {key}: never_invent must be true exactly for value slots')
+        require(not slot.get('listen') or slot['kind'] == 'feel',
+                f'decision slot {key}: listen requires kind feel')
+        require(set(slot.get('from', [])) <= DECISION_SLOT_SOURCES,
+                f'decision slot {key}: unknown from source')
+        if 'choices' in slot:
+            require(slot['choices'] in choices, f'decision slot {key}: unknown choices {slot["choices"]}')
+            options = choices[slot['choices']]
+            if 'default' in slot and isinstance(options, list):
+                require(slot['default'] in options, f'decision slot {key}: default is not a choice')
+
+    schema = load_json(root / 'references/tool-schemas/save_agent.json')
+    agent_fields = set(schema['inputSchema']['$defs']['AgentDataCreate']['properties']) | {'agent_type'}
+    for key, slot in slots.items():
+        for target in slot.get('affects', []):
+            require(target.split('.')[0] in agent_fields,
+                    f'decision slot {key}: affects {target} is not an agent field')
+
+    workflows = {w['id'] for w in load_json(root / 'references/workflow-capabilities.json')['workflows']}
+    require(bool(data['profiles']), 'decision-slots.json needs at least one profile')
+    used_by_campaign = []
+    for profile in data['profiles']:
+        require(profile['workflow'] in workflows, f'decision profile {profile["id"]}: unknown workflow')
+        listed = list(profile['common'])
+        for direction in ('outbound', 'inbound'):
+            for tier, keys in profile[direction].items():
+                require(tier in tiers, f'decision profile {profile["id"]}: unknown tier {tier}')
+                listed += keys
+        require(all(key in slots for key in listed),
+                f'decision profile {profile["id"]}: key not defined in slots')
+        require(set(profile['by_campaign']) == set(choices['campaign']),
+                f'decision profile {profile["id"]}: by_campaign must match choices.campaign')
+        for keys in profile['by_campaign'].values():
+            used_by_campaign += keys
+    require(set(campaign_slots) <= set(kinds), 'campaign_slots groups must be defined kinds')
+    defined = [key for group in campaign_slots.values() for key in group]
+    require(len(used_by_campaign) == len(set(used_by_campaign))
+            and set(used_by_campaign) == set(defined) and len(defined) == len(set(defined)),
+            'by_campaign keys must match campaign_slots keys exactly, without duplicates')
+    require(not set(defined) & set(slots), 'campaign_slots keys must not repeat slots keys')
+    require(set(choices['inbound_scope']) == {'ivr', 'reception', 'intake'},
+            'choices.inbound_scope must define the three inbound scopes')
+
+
 def validate(root):
     catalog = load_json(root / 'catalog.json')
     entries = catalog['skills']
@@ -277,6 +356,7 @@ def validate(root):
     validate_skill_tool_references(catalog, implemented_tools)
     validate_workflow_capabilities(root, catalog, implemented_tools)
     validate_tool_examples(root, implemented_tools, schemas)
+    validate_decision_slots(root)
 
     for entry in entries:
         path = root / entry['path']
